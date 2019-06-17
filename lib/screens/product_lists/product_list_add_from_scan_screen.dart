@@ -20,7 +20,6 @@ class ProductListAddFromScanScreen extends StatefulWidget {
 class _ProductListAddFromScanScreenState extends State<ProductListAddFromScanScreen> {
 
   String currentCode = "";
-  int verifyCounter = 0;
 
   Future<int> getInputForCount(BuildContext context) async {
     TextEditingController countController = TextEditingController();
@@ -74,23 +73,42 @@ class _ProductListAddFromScanScreenState extends State<ProductListAddFromScanScr
   Column buildBody(_ViewModel vm, BuildContext context) {
     return Column(
       children: <Widget>[
-        SizedBox(
-          width: MediaQuery.of(context).size.width,
-          height: 600,
+        Expanded(
+          //width: MediaQuery.of(context).size.width,
+          //height: MediaQuery.of(context).size.height / 2,
           child: QrCamera(
             qrCodeCallback: (String code) {
+              if (code == currentCode) return;
               setState(() {
                 currentCode = code;
               });
             },
           ),
         ),
-        Text(
-          currentCode,
-          style: TextStyle(
-            color: Colors.red,
-            fontWeight: FontWeight.bold
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: 100,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              currentCode,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: (currentCode.length == 7) ? Colors.green : Colors.red,
+                fontSize: 30.0,
+              ),
+            )
+          )
+        ),
+        ListTile(
+          title: Text(
+            "Bæta í lista", 
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+            textAlign: TextAlign.center,
           ),
+          onTap: () {
+            addProductToList(vm, context, currentCode);
+          },
         )
       ],
     );
