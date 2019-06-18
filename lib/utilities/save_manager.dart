@@ -1,15 +1,11 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
+import 'package:husa_app/utilities/common.dart';
 import 'package:redux/redux.dart';
 import '../actions/app_actions.dart';
 import '../models/product.dart';
 import '../models/app_state.dart';
-
-class FileDoesNotExistException implements Exception {
-  String cause;
-  FileDoesNotExistException(this.cause);
-}
 
 Middleware<AppState> createSaveMiddleware() {
   return (Store store, action, NextDispatcher next) async {

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:husa_app/actions/product_actions.dart';
+import '../actions/product_actions.dart';
 
 class Product {
   final String name;
@@ -7,6 +7,7 @@ class Product {
   final int price;
   final String description;
   final String url;
+  final String imageUrl;
 
   Product({
     @required this.name,
@@ -14,6 +15,7 @@ class Product {
     @required this.price,
     @required this.description,
     @required this.url,
+    @required this.imageUrl,
   });
 
   static Product fromJson(Map<String, dynamic> json) {
@@ -28,7 +30,8 @@ class Product {
       productNumber: json["Id"],
       price: priceValue,
       description: json["Description"] ?? "",
-      url: json["Url"]
+      url: json["Url"],
+      imageUrl: json["ImageUrl"] ?? "",
     );
   }
 }

@@ -8,6 +8,8 @@ import 'package:husa_app/screens/product_lists/product_list_item_screen.dart';
 import '../../models/app_state.dart';
 import '../../actions/product_actions.dart';
 import '../../models/product.dart';
+import '../../widgets/ConfirmDialog.dart';
+import '../../widgets/TextInputDialog.dart';
 import 'product_list_info_screen.dart';
 
 class ProductListScreen extends StatelessWidget {
@@ -16,81 +18,61 @@ class ProductListScreen extends StatelessWidget {
   final int index;
 
   Future<String> getInputForProductNumber(BuildContext context) async {
-    TextEditingController productNumberController = TextEditingController();
     String result;
 
     await showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("Vörunúmer"),
-            content: TextField(
-              autofocus: true,
-              controller: productNumberController,
-              decoration: InputDecoration(hintText: "Vörunúmer"),
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.next,
-              onSubmitted: (value) {
-                result = productNumberController.text;
-                Navigator.of(context).pop();
-              },
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Hætta við"),
-                onPressed: () {
-                  result = null;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text("Bæta við"),
-                onPressed: () {
-                  result = productNumberController.text;
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return TextInputDialog(
+            title: "Vörunúmer",
+            hint: "Vörunúmer",
+            keyboardType: TextInputType.number,
+            confirmText: "Bæta við",
+            cancelText: "Hætta við",
+            onFinish: (shouldAdd, productNumber) {
+              if (shouldAdd) result = productNumber;
+            },
           );
         });
     return result;
   }
 
   Future<int> getInputForCount(BuildContext context) async {
-    TextEditingController countController = TextEditingController();
     int result;
 
     await showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("Fjöldi"),
-            content: TextField(
-              controller: countController,
-              autofocus: true,
-              decoration: InputDecoration(hintText: "Fjöldi"),
-              keyboardType: TextInputType.number,
-              onSubmitted: (value) {
-                result = int.parse(countController.text);
-                Navigator.of(context).pop();
-              },
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Hætta við"),
-                onPressed: () {
-                  result = null;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text("Bæta við"),
-                onPressed: () {
-                  result = int.parse(countController.text);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return TextInputDialog(
+            title: "Fjöldi",
+            hint: "Fjöldi",
+            keyboardType: TextInputType.number,
+            confirmText: "Bæta við",
+            cancelText: "Hætta við",
+            onFinish: (shouldAdd, count) {
+              if (shouldAdd) {
+                result = int.parse(count);
+              }
+            },
+          );
+        });
+    return result;
+  }
+
+  Future<bool> confirmAlreadyInList(BuildContext context) async {
+    bool result = false;
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return ConfirmDialog(
+            title: "Vara nú þegar í listanum",
+            body: "Varan er nú þegar í listanum.  Viltu samt bæta henni í?",
+            confirmButtonText: "Bæta",
+            cancelButtonText: "Hætta við",
+            warning: true,
+            onAccept: () => result = true,
+            onDeny: () => result = false,
           );
         });
     return result;
@@ -103,26 +85,15 @@ class ProductListScreen extends StatelessWidget {
     await showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("Eyða úr lista"),
-            content: Text(
-                "Ertu viss um að þú viljir eyða ${product.productNumber} úr lista?"),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Hætta við"),
-                onPressed: () {
-                  result = false;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text("Eyða"),
-                onPressed: () {
-                  result = true;
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return ConfirmDialog(
+            title: "Eyða úr lista",
+            body:
+                "Ertu viss um að þú viljir eyða ${product.productNumber} úr lista?",
+            confirmButtonText: "Eyða",
+            cancelButtonText: "Hætta við",
+            warning: true,
+            onAccept: () => result = true,
+            onDeny: () => result = false,
           );
         });
     return result;
@@ -134,25 +105,14 @@ class ProductListScreen extends StatelessWidget {
     await showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("Eyða öllu úr lista"),
-            content: Text("Ertu viss um að þú viljir eyða öllu úr listanum?"),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Hætta við"),
-                onPressed: () {
-                  result = false;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text("Eyða"),
-                onPressed: () {
-                  result = true;
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return ConfirmDialog(
+            title: "Eyða öllu úr lista",
+            body: "Ertu viss um að þú viljir eyða öllu úr listanum?",
+            confirmButtonText: "Eyða",
+            cancelButtonText: "Hætta við",
+            warning: true,
+            onAccept: () => result = true,
+            onDeny: () => result = false,
           );
         });
     return result;
@@ -163,6 +123,12 @@ class ProductListScreen extends StatelessWidget {
     if (productNumber == null) return;
     var count = await getInputForCount(context);
     if (count == null) return;
+    if (vm.productLists[index].list
+            .where((item) => item.productNumber == productNumber)
+            .length >
+        0) {
+      if (!(await confirmAlreadyInList(context))) return;
+    }
     vm.store.dispatch(AddToProductListAction(
         productNumber: productNumber, count: count, index: index));
     vm.store.dispatch(SaveProductListsAction());
@@ -174,6 +140,12 @@ class ProductListScreen extends StatelessWidget {
       if (productNumber == null) return;
       var count = await getInputForCount(context);
       if (count == null) return;
+      if (vm.productLists[index].list
+              .where((item) => item.productNumber == productNumber)
+              .length >
+          0) {
+        if (!(await confirmAlreadyInList(context))) return;
+      }
       vm.store.dispatch(AddToProductListAction(
           productNumber: productNumber, count: count, index: index));
       vm.store.dispatch(SaveProductListsAction());
@@ -196,24 +168,45 @@ class ProductListScreen extends StatelessWidget {
     }
   }
 
+  String productNameFromNumber(String productNumber, _ViewModel vm) {
+    var result = vm.productList
+        .where((item) => item.productNumber == productNumber)
+        .toList();
+    if (result.length > 0) return result.first.name;
+    return null;
+  }
+
   Column buildBody(_ViewModel vm, ProductList productList) {
     return Column(
       children: <Widget>[
-        (productList.note != null && productList.note != "")
-            ? Padding(
-                padding: EdgeInsets.only(
-                    left: 15.0, right: 15.0, top: 10.0, bottom: 0.0),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(productList.note)))
-            : Container(),
+        Visibility(
+          visible: (productList.note != null && productList.note != ""),
+          child: Padding(
+              padding: EdgeInsets.only(
+                  left: 15.0, right: 15.0, top: 10.0, bottom: 0.0),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(productList.note ?? ""))),
+        ),
         Expanded(
-          child: ListView.builder(
+          child: ListView.separated(
+            separatorBuilder: (context, index) {
+              return Divider(
+                color: Colors.black26,
+              );
+            },
             itemCount: productList.list.length,
             itemBuilder: (context, position) {
+              var productListItem = productList.list[position];
               return ListTile(
-                title: Text("${productList.list[position].productNumber}"),
-                subtitle: Text("Magn ${productList.list[position].count}"),
+                title: Text("${productListItem.productNumber}"),
+                trailing: Text(
+                  "${productListItem.count}",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                ),
+                subtitle: Text(
+                    productNameFromNumber(productListItem.productNumber, vm) ??
+                        "Ekki á síðu"),
                 onTap: () {
                   Navigator.push(
                       context,
@@ -301,16 +294,19 @@ class ProductListScreen extends StatelessWidget {
 
 class _ViewModel {
   List<ProductList> productLists;
+  List<Product> productList;
   Store<AppState> store;
 
   _ViewModel({
     @required this.productLists,
+    @required this.productList,
     @required this.store,
   });
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       productLists: store.state.productLists,
+      productList: store.state.productList,
       store: store,
     );
   }

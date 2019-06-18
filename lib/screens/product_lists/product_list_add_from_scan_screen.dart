@@ -6,6 +6,7 @@ import 'package:qr_mobile_vision/qr_camera.dart';
 import '../../models/app_state.dart';
 import '../../actions/product_actions.dart';
 import '../../models/product.dart';
+import '../../widgets/ConfirmDialog.dart';
 
 class ProductListAddFromScanScreen extends StatefulWidget {
   ProductListAddFromScanScreen({Key key, this.index}) : super(key: key);
@@ -61,10 +62,36 @@ class _ProductListAddFromScanScreenState extends State<ProductListAddFromScanScr
     return result;
   }
 
+  Future<bool> confirmAlreadyInList(BuildContext context) async {
+    bool result = false;
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return ConfirmDialog(
+            title: "Vara nú þegar í listanum",
+            body:
+                "Varan er nú þegar í listanum.  Viltu samt bæta henni í?",
+            confirmButtonText: "Bæta",
+            cancelButtonText: "Hætta við",
+            warning: true,
+            onAccept: () => result = true,
+            onDeny: () => result = false,
+          );
+        });
+    return result;
+  }
+
   void addProductToList(_ViewModel vm, BuildContext context, String productNumber) async {
     if (productNumber == null) return;
     var count = await getInputForCount(context);
     if (count == null) return;
+    if (vm.productLists[widget.index].list
+            .where((item) => item.productNumber == productNumber)
+            .length >
+        0) {
+          if (!(await confirmAlreadyInList(context))) return;
+        }
     vm.store.dispatch(AddToProductListAction(
         productNumber: productNumber, count: count, index: widget.index));
     vm.store.dispatch(SaveProductListsAction());
@@ -102,10 +129,15 @@ class _ProductListAddFromScanScreenState extends State<ProductListAddFromScanScr
         ),
         ListTile(
           title: Text(
-            "Bæta í lista", 
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+            "Bæta í lista",
+            style: TextStyle(
+              fontSize: 18,
+               fontWeight: FontWeight.bold,
+                color: (currentCode != "") ? Colors.green : Colors.black26,
+              ),
             textAlign: TextAlign.center,
           ),
+          enabled: currentCode != "",
           onTap: () {
             addProductToList(vm, context, currentCode);
           },
@@ -122,10 +154,9 @@ class _ProductListAddFromScanScreenState extends State<ProductListAddFromScanScr
         converter: _ViewModel.fromStore,
         // Our builder now takes in a _viewModel as a second arg
         builder: (BuildContext context, _ViewModel vm) {
-          var productList = vm.productLists[widget.index];
           return Scaffold(
             appBar: AppBar(
-              title: Text(productList.name), 
+              title: Text("Bæta við"), 
               leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {

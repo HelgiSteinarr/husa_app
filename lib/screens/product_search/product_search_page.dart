@@ -132,7 +132,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               ));
             });
 
-            if (searchTextController.text != "" ) {
+            if (searchTextController.text != "") {
               searchBarEndIcon = Icons.close;
             }
 
