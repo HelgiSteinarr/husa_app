@@ -70,7 +70,6 @@ class _ProductListInfoScreenState extends State<ProductListInfoScreen> {
                     decoration: InputDecoration(
                       labelText: "Nafn",
                     ),
-                    keyboardType: TextInputType.number,
                   ),
                 ),
 

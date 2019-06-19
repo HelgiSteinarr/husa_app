@@ -69,6 +69,7 @@ class ProductListsPage extends StatelessWidget {
     var productCount = vm.productLists[position].list.length;
 
     return ListTile(
+      leading: Icon(Icons.assignment, size: 38.0),
       title: Text(vm.productLists[position].name),
       subtitle: Text(
           "Inniheldur ${(productCount == 1) ? 'eina vöru' : productCount.toString() + ' vörur'}"),
