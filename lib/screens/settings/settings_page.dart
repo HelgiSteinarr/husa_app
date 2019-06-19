@@ -9,7 +9,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../../widgets/UpdateDataDialog.dart';
 import '../../models/app_state.dart';
-import '../../models/product.dart';
+import '../../models/product_list.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);

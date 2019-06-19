@@ -5,8 +5,8 @@ import 'package:husa_app/widgets/SearchBarButton.dart';
 import 'package:redux/redux.dart';
 import 'product_info_screen.dart';
 import '../../models/app_state.dart';
-import '../../actions/product_actions.dart';
-import '../../models/product.dart';
+import '../../actions/product_data_actions.dart';
+import '../../models/product_data.dart';
 
 class ProductSearchPage extends StatefulWidget {
   ProductSearchPage({Key key}) : super(key: key);
@@ -21,7 +21,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   IconData searchBarEndIcon = Icons.search;
 
   Future changeSearchTypes(BuildContext context, _ViewModel vm) async {
-    List<ProductSearchType> searchTypes =
+    List<ProductDataSearchType> searchTypes =
         List.from(vm.searchResult.searchTypes);
 
     await showDialog(
@@ -40,7 +40,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               FlatButton(
                 child: Text("Breyta"),
                 onPressed: () {
-                  vm.store.dispatch(SearchProductAction(
+                  vm.store.dispatch(SearchProductDataAction(
                     searchString: searchTextController.text,
                     searchTypes: searchTypes,
                   ));
@@ -54,7 +54,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
 
   Widget searchResultBuilder(
       BuildContext context, int position, _ViewModel vm) {
-    var product = vm.productList[vm.searchResult.productIndexes[position]];
+    var product = vm.productData[vm.searchResult.productIndexes[position]];
     return ListTile(
       title: Text(product.name),
       subtitle: Text(product.productNumber),
@@ -126,7 +126,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               } else {
                 searchBarEndIcon = Icons.close;
               }
-              vm.store.dispatch(SearchProductAction(
+              vm.store.dispatch(SearchProductDataAction(
                 searchString: searchTextController.text,
                 searchTypes: vm.store.state.productSearchResult.searchTypes,
               ));
@@ -173,7 +173,7 @@ class _SearchTypesDialogList extends StatefulWidget {
     this.vm,
   }) : super(key: key);
 
-  final List<ProductSearchType> searchTypes;
+  final List<ProductDataSearchType> searchTypes;
   final _ViewModel vm;
 
   @override
@@ -181,7 +181,7 @@ class _SearchTypesDialogList extends StatefulWidget {
 }
 
 class _SearchTypesDialogListState extends State<_SearchTypesDialogList> {
-  List<ProductSearchType> searchTypes;
+  List<ProductDataSearchType> searchTypes;
 
   @override
   void initState() {
@@ -189,7 +189,7 @@ class _SearchTypesDialogListState extends State<_SearchTypesDialogList> {
     searchTypes = widget.searchTypes;
   }
 
-  Widget buildListTile(String title, ProductSearchType type) {
+  Widget buildListTile(String title, ProductDataSearchType type) {
     return CheckboxListTile(
       title: Text(title),
       value: searchTypes.contains(type),
@@ -211,9 +211,9 @@ class _SearchTypesDialogListState extends State<_SearchTypesDialogList> {
     return Container(
       child: Column(
         children: <Widget>[
-          buildListTile("Vörunúmeri", ProductSearchType.productNumber),
-          buildListTile("Nafni", ProductSearchType.name),
-          buildListTile("Lýsingu", ProductSearchType.description),
+          buildListTile("Vörunúmeri", ProductDataSearchType.productNumber),
+          buildListTile("Nafni", ProductDataSearchType.name),
+          buildListTile("Lýsingu", ProductDataSearchType.description),
         ],
       ),
       height: 170.0,
@@ -222,20 +222,20 @@ class _SearchTypesDialogListState extends State<_SearchTypesDialogList> {
 }
 
 class _ViewModel {
-  final ProductSearchResult searchResult;
-  final List<Product> productList;
+  final ProductDataSearchResult searchResult;
+  final List<Product> productData;
   final Store<AppState> store;
 
   _ViewModel({
     @required this.searchResult,
-    @required this.productList,
+    @required this.productData,
     @required this.store,
   });
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       searchResult: store.state.productSearchResult,
-      productList: store.state.productList,
+      productData: store.state.productData,
       store: store,
     );
   }

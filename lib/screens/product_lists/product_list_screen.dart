@@ -5,12 +5,13 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:husa_app/actions/app_actions.dart';
 import 'package:husa_app/screens/product_lists/product_list_item_screen.dart';
+import 'product_list_info_screen.dart';
 import '../../models/app_state.dart';
-import '../../actions/product_actions.dart';
-import '../../models/product.dart';
+import '../../actions/product_list_actions.dart';
+import '../../models/product_list.dart';
+import '../../models/product_data.dart';
 import '../../widgets/ConfirmDialog.dart';
 import '../../widgets/TextInputDialog.dart';
-import 'product_list_info_screen.dart';
 
 class ProductListScreen extends StatelessWidget {
   ProductListScreen({Key key, this.index}) : super(key: key);
@@ -130,7 +131,7 @@ class ProductListScreen extends StatelessWidget {
       if (!(await confirmAlreadyInList(context))) return;
     }
     vm.store.dispatch(AddToProductListAction(
-        productNumber: productNumber, count: count, index: index));
+        productListItem: ProductListItem(productNumber: productNumber, count: count, note: ""), index: index));
     vm.store.dispatch(SaveProductListsAction());
   }
 
@@ -147,7 +148,7 @@ class ProductListScreen extends StatelessWidget {
         if (!(await confirmAlreadyInList(context))) return;
       }
       vm.store.dispatch(AddToProductListAction(
-          productNumber: productNumber, count: count, index: index));
+        productListItem: ProductListItem(productNumber: productNumber, count: count, note: ""), index: index));
       vm.store.dispatch(SaveProductListsAction());
     }
   }
@@ -169,7 +170,7 @@ class ProductListScreen extends StatelessWidget {
   }
 
   String productNameFromNumber(String productNumber, _ViewModel vm) {
-    var result = vm.productList
+    var result = vm.productData
         .where((item) => item.productNumber == productNumber)
         .toList();
     if (result.length > 0) return result.first.name;
@@ -294,19 +295,19 @@ class ProductListScreen extends StatelessWidget {
 
 class _ViewModel {
   List<ProductList> productLists;
-  List<Product> productList;
+  List<Product> productData;
   Store<AppState> store;
 
   _ViewModel({
     @required this.productLists,
-    @required this.productList,
+    @required this.productData,
     @required this.store,
   });
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       productLists: store.state.productLists,
-      productList: store.state.productList,
+      productData: store.state.productData,
       store: store,
     );
   }

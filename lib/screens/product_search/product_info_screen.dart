@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:husa_app/utilities/common.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../models/product.dart';
+import '../../models/product_data.dart';
 
 class ProductInfoScreen extends StatelessWidget {
   ProductInfoScreen({Key key, this.product}) : super(key: key);

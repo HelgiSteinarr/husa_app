@@ -3,8 +3,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:husa_app/actions/app_actions.dart';
 import 'package:redux/redux.dart';
 import '../../models/app_state.dart';
-import '../../actions/product_actions.dart';
-import '../../models/product.dart';
+import '../../actions/product_list_actions.dart';
+import '../../models/product_list.dart';
+import '../../models/product_data.dart';
 import '../product_search/product_info_screen.dart';
 
 class ProductListItemScreen extends StatefulWidget {
@@ -26,13 +27,50 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
 
   bool controllersTextSet = false;
 
+  Future<int> selectOtherList(BuildContext context, _ViewModel vm) async {
+    /* Returns list index */
+    int result;
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Veldu lista"),
+            content: Column(
+              children: vm.productLists.map((item) {
+                return ListTile(
+                  title: Text(item.name),
+                  onTap: () {
+                    result = vm.productLists.indexOf(item);
+                    Navigator.pop(context);
+                  },
+                );
+              }).toList(),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Hætta við", style: TextStyle(color: Colors.black)),
+                splashColor: Colors.black26,
+                highlightColor: Colors.black12,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+    return result;
+  }
+
   void save(_ViewModel vm) {
     var updateAction = UpdateProductListItemAction(
       listIndex: widget.listIndex,
       itemIndex: widget.itemIndex,
-      productNumber: productNumberTextController.text ?? "",
-      count: int.parse(countTextController.text ?? "1") ?? 1,
-      note: noteTextController.text,
+      newProductListItem: ProductListItem(
+        productNumber: productNumberTextController.text ?? "",
+        count: int.parse(countTextController.text ?? "1") ?? 1,
+        note: noteTextController.text,
+      ),
     );
 
     vm.store.dispatch(updateAction);
@@ -40,11 +78,32 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
   }
 
   Product findProductFromListItem(String productNumber, _ViewModel vm) {
-    var result = vm.productList
+    var result = vm.productData
         .where((item) => item.productNumber == productNumber)
         .toList();
     if (result.length > 0) return result.first;
     return null;
+  }
+
+  Future copyItem(BuildContext context, _ViewModel vm) async {
+    var selectedListIndex = await selectOtherList(context, vm);
+    if (selectedListIndex == null) return;
+    vm.store.dispatch(CopyProductListItemAction(
+      originalListIndex: widget.listIndex,
+      targetListIndex: selectedListIndex,
+      itemIndex: widget.itemIndex,
+    ));
+  }
+
+  Future moveItem(BuildContext context, _ViewModel vm) async {
+    var selectedListIndex = await selectOtherList(context, vm);
+    if (selectedListIndex == null) return;
+    Navigator.pop(context);
+    vm.store.dispatch(MoveProductListItemAction(
+      originalListIndex: widget.listIndex,
+      targetListIndex: selectedListIndex,
+      itemIndex: widget.itemIndex,
+    ));
   }
 
   Widget buildBody(
@@ -65,6 +124,21 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
                           ProductInfoScreen(product: product)));
             },
           ),
+        ),
+        ListTile(
+          title: Text("Færa"),
+          onTap: () async {
+            await moveItem(context, vm);
+          },
+        ),
+        ListTile(
+          title: Text("Afrita"),
+          onTap: () async {
+            await copyItem(context, vm);
+          },
+        ),
+        Divider(
+          color: Colors.black26,
         ),
         Padding(
           padding: EdgeInsets.all(10.0),
@@ -136,19 +210,19 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
 
 class _ViewModel {
   List<ProductList> productLists;
-  List<Product> productList;
+  List<Product> productData;
   Store<AppState> store;
 
   _ViewModel({
     @required this.productLists,
-    @required this.productList,
+    @required this.productData,
     @required this.store,
   });
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       productLists: store.state.productLists,
-      productList: store.state.productList,
+      productData: store.state.productData,
       store: store,
     );
   }

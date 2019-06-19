@@ -4,8 +4,8 @@ import 'package:husa_app/actions/app_actions.dart';
 import 'package:husa_app/screens/product_lists/product_list_screen.dart';
 import 'package:redux/redux.dart';
 import '../../models/app_state.dart';
-import '../../actions/product_actions.dart';
-import '../../models/product.dart';
+import '../../actions/product_list_actions.dart';
+import '../../models/product_list.dart';
 import '../../widgets/ConfirmDialog.dart';
 import '../../widgets/TextInputDialog.dart';
 
@@ -69,7 +69,11 @@ class ProductListsPage extends StatelessWidget {
     var productCount = vm.productLists[position].list.length;
 
     return ListTile(
-      leading: Icon(Icons.assignment, size: 38.0),
+      leading: SizedBox(
+        width: 40.0,
+        height: 40.0,
+        child: Center(child: Icon(Icons.assignment, size: 30.0)),
+      ),
       title: Text(vm.productLists[position].name),
       subtitle: Text(
           "Inniheldur ${(productCount == 1) ? 'eina vöru' : productCount.toString() + ' vörur'}"),

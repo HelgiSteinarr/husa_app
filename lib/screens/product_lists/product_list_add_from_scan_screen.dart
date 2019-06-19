@@ -4,8 +4,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:husa_app/actions/app_actions.dart';
 import 'package:qr_mobile_vision/qr_camera.dart';
 import '../../models/app_state.dart';
-import '../../actions/product_actions.dart';
-import '../../models/product.dart';
+import '../../actions/product_list_actions.dart';
+import '../../models/product_list.dart';
 import '../../widgets/ConfirmDialog.dart';
 
 class ProductListAddFromScanScreen extends StatefulWidget {
@@ -93,7 +93,7 @@ class _ProductListAddFromScanScreenState extends State<ProductListAddFromScanScr
           if (!(await confirmAlreadyInList(context))) return;
         }
     vm.store.dispatch(AddToProductListAction(
-        productNumber: productNumber, count: count, index: widget.index));
+        productListItem: ProductListItem(productNumber: productNumber, count: count, note: ""), index: widget.index));
     vm.store.dispatch(SaveProductListsAction());
   }
 

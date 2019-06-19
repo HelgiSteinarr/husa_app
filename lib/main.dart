@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:husa_app/utilities/product_data_manager.dart';
-import 'package:husa_app/widgets/UpdateDataDialog.dart';
+import 'package:husa_app/actions/product_data_actions.dart';
+import 'package:husa_app/models/product_data.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'utilities/search.dart';
 import 'screens/main_screen.dart';
-import 'actions/product_actions.dart';
 import 'models/app_state.dart';
-import 'models/product.dart';
 import 'reducers/root_reducer.dart';
 import 'utilities/save_manager.dart';
 
@@ -27,12 +24,12 @@ class _AppRootState extends State<AppRoot> {
     initialState: new AppState(
         appReady: false,
         productLoaded: false,
-        productSearchResult: ProductSearchResult(
+        productSearchResult: ProductDataSearchResult(
             productIndexes: List(),
             searchString: "",
-            searchTypes: [ProductSearchType.productNumber, ProductSearchType.name]),
+            searchTypes: [ProductDataSearchType.productNumber, ProductDataSearchType.name]),
         productLists: List(),
-        productList: List()),
+        productData: List()),
     middleware: []..add(createSaveMiddleware())..add(createSearchMiddleware()),
   );
 

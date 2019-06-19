@@ -3,8 +3,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:husa_app/actions/app_actions.dart';
 import 'package:redux/redux.dart';
 import '../../models/app_state.dart';
-import '../../actions/product_actions.dart';
-import '../../models/product.dart';
+import '../../actions/product_list_actions.dart';
+import '../../models/product_list.dart';
 
 class ProductListInfoScreen extends StatefulWidget {
   ProductListInfoScreen({Key key, this.index}) : super(key: key);

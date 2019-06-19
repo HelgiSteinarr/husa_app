@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:husa_app/utilities/common.dart';
 import 'package:redux/redux.dart';
 import '../actions/app_actions.dart';
-import '../models/product.dart';
+import '../models/product_list.dart';
 import '../models/app_state.dart';
 
 Middleware<AppState> createSaveMiddleware() {

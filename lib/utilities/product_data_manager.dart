@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 import 'package:redux/redux.dart';
 
-import '../actions/product_actions.dart';
+import '../actions/product_data_actions.dart';
 import '../utilities/common.dart';
 import '../models/app_state.dart';
-import '../models/product.dart';
+import '../models/product_data.dart';
 
 class ProductDataManager {
   ProductDataManager({this.store});

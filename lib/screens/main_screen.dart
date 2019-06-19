@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:husa_app/actions/product_actions.dart';
+import 'package:husa_app/actions/product_list_actions.dart';
 import 'package:husa_app/models/app_state.dart';
 import 'package:husa_app/screens/product_lists/product_lists_page.dart';
 import 'package:husa_app/screens/product_search/product_search_page.dart';

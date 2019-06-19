@@ -1,7 +1,7 @@
-import 'package:husa_app/actions/product_actions.dart';
+import 'package:husa_app/actions/product_data_actions.dart';
 import 'package:redux/redux.dart';
 import '../actions/app_actions.dart';
-import '../models/product.dart';
+import '../models/product_data.dart';
 import '../models/app_state.dart';
 import 'package:async/async.dart';
 
@@ -9,16 +9,16 @@ CancelableOperation searchOperation;
 
 Middleware<AppState> createSearchMiddleware() {
   return (Store<AppState> store, action, NextDispatcher next) async {
-    if (action is SearchProductAction) {
+    if (action is SearchProductDataAction) {
       if (searchOperation != null) {
         searchOperation.cancel();
       }
       searchOperation = CancelableOperation.fromFuture(() async {
 
         if (action.searchString == "") {
-          var productIndexes = List<int>.generate(store.state.productList.length, (index) => index);
+          var productIndexes = List<int>.generate(store.state.productData.length, (index) => index);
 
-          return UpdateProductSearchResultsAction(
+          return UpdateProductDataSearchResultsAction(
             productIndexes: productIndexes,
             searchString: action.searchString,
             searchTypes: action.searchTypes,
@@ -26,13 +26,13 @@ Middleware<AppState> createSearchMiddleware() {
         }
 
         bool searchInProductNumbers =
-            action.searchTypes.contains(ProductSearchType.productNumber);
+            action.searchTypes.contains(ProductDataSearchType.productNumber);
         bool searchInNames =
-            action.searchTypes.contains(ProductSearchType.name);
+            action.searchTypes.contains(ProductDataSearchType.name);
         bool searchInDescriptions =
-            action.searchTypes.contains(ProductSearchType.description);
+            action.searchTypes.contains(ProductDataSearchType.description);
 
-        List<Product> productList = store.state.productList;
+        List<Product> productList = store.state.productData;
         List<int> foundProductsIndexes = List();
         String searchString = action.searchString.toLowerCase();
 
@@ -56,7 +56,7 @@ Middleware<AppState> createSearchMiddleware() {
           }
         }
 
-        return UpdateProductSearchResultsAction(
+        return UpdateProductDataSearchResultsAction(
           productIndexes: foundProductsIndexes,
           searchString: action.searchString,
           searchTypes: action.searchTypes,
