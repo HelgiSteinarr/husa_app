@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:husa_app/screens/product_lists/product_list_add_from_scan_screen.dart';
+import 'package:husa_app/widgets/ColorLabelIcon.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -131,7 +132,9 @@ class ProductListScreen extends StatelessWidget {
       if (!(await confirmAlreadyInList(context))) return;
     }
     vm.store.dispatch(AddToProductListAction(
-        productListItem: ProductListItem(productNumber: productNumber, count: count, note: ""), index: index));
+        productListItem: ProductListItem(
+            productNumber: productNumber, count: count, note: ""),
+        index: index));
     vm.store.dispatch(SaveProductListsAction());
   }
 
@@ -148,7 +151,9 @@ class ProductListScreen extends StatelessWidget {
         if (!(await confirmAlreadyInList(context))) return;
       }
       vm.store.dispatch(AddToProductListAction(
-        productListItem: ProductListItem(productNumber: productNumber, count: count, note: ""), index: index));
+          productListItem: ProductListItem(
+              productNumber: productNumber, count: count, note: ""),
+          index: index));
       vm.store.dispatch(SaveProductListsAction());
     }
   }
@@ -199,7 +204,22 @@ class ProductListScreen extends StatelessWidget {
             itemCount: productList.list.length,
             itemBuilder: (context, position) {
               var productListItem = productList.list[position];
+              ColorLabel label;
+              if (productList.labels != null &&
+                  productListItem.labelIndex != null &&
+                  productList.labels.length >
+                      productListItem.labelIndex) {
+                label = productList.labels[productListItem.labelIndex];
+              } else {
+                label = ColorLabel(colorIndex: 0, text: "");
+              }
+
               return ListTile(
+                leading: Container(
+                  width: 40.0,
+                  height: 40.0,
+                  child: Center(child: ColorLabelIcon(label: label)),
+                ),
                 title: Text("${productListItem.productNumber}"),
                 trailing: Text(
                   "${productListItem.count}",

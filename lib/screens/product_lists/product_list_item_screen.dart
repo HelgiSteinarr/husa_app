@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:husa_app/actions/app_actions.dart';
+import 'package:husa_app/widgets/ColorLabelIcon.dart';
 import 'package:redux/redux.dart';
 import '../../models/app_state.dart';
 import '../../actions/product_list_actions.dart';
@@ -24,6 +25,7 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
       TextEditingController();
   final TextEditingController countTextController = TextEditingController();
   final TextEditingController noteTextController = TextEditingController();
+  int labelIndex;
 
   bool controllersTextSet = false;
 
@@ -62,6 +64,48 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
     return result;
   }
 
+  Future<int> selectLabel(BuildContext context, _ViewModel vm) async {
+    int result;
+    var productList = vm.productLists[widget.listIndex];
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Veldu merki"),
+            content: Column(
+              children: productList.labels.map((label) {
+                return ListTile(
+                  leading: Container(
+                    width: 40.0,
+                    height: 40.0,
+                    child: Center(
+                      child: ColorLabelIcon(label: label),
+                    ),
+                  ),
+                  title: Text(label.text),
+                  onTap: () {
+                    result = productList.labels.indexOf(label);
+                    Navigator.pop(context);
+                  },
+                );
+              }).toList(),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Hætta við", style: TextStyle(color: Colors.black)),
+                splashColor: Colors.black26,
+                highlightColor: Colors.black12,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+    return result;
+  }
+
   void save(_ViewModel vm) {
     var updateAction = UpdateProductListItemAction(
       listIndex: widget.listIndex,
@@ -70,6 +114,7 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
         productNumber: productNumberTextController.text ?? "",
         count: int.parse(countTextController.text ?? "1") ?? 1,
         note: noteTextController.text,
+        labelIndex: labelIndex,
       ),
     );
 
@@ -93,6 +138,7 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
       targetListIndex: selectedListIndex,
       itemIndex: widget.itemIndex,
     ));
+    vm.store.dispatch(SaveProductListsAction());
   }
 
   Future moveItem(BuildContext context, _ViewModel vm) async {
@@ -104,11 +150,31 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
       targetListIndex: selectedListIndex,
       itemIndex: widget.itemIndex,
     ));
+    vm.store.dispatch(SaveProductListsAction());
+  }
+
+  Future setLabel(BuildContext context, _ViewModel vm) async {
+    int labelIndex = await selectLabel(context, vm);
+    if (labelIndex == null) return;
+    setState(() {
+      this.labelIndex = labelIndex;
+    });
   }
 
   Widget buildBody(
       BuildContext context, ProductListItem productListItem, _ViewModel vm) {
     var product = findProductFromListItem(productListItem.productNumber, vm);
+    var productList = vm.productLists[widget.listIndex];
+
+    ColorLabel label;
+    if (productList.labels != null &&
+        labelIndex != null &&
+        productList.labels.length > labelIndex) {
+      label = productList.labels[labelIndex];
+    } else {
+      label = ColorLabel(colorIndex: 0, text: null);
+    }
+
     return ListView(
       children: <Widget>[
         Visibility(
@@ -124,6 +190,18 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
                           ProductInfoScreen(product: product)));
             },
           ),
+        ),
+        ListTile(
+          leading: Container(
+            width: 40.0,
+            height: 40.0,
+            child: Center(child: ColorLabelIcon(label: label)),
+          ),
+          title: Text("Skipta um merki"),
+          subtitle: Text(label.text ?? "Ekkert valið"),
+          onTap: () async {
+            await setLabel(context, vm);
+          },
         ),
         ListTile(
           title: Text("Færa"),
@@ -186,6 +264,7 @@ class _ProductListItemScreenState extends State<ProductListItemScreen> {
                 productListItem.productNumber ?? "";
             countTextController.text = (productListItem.count ?? 1).toString();
             noteTextController.text = productListItem.note ?? "";
+            labelIndex = productListItem.labelIndex;
             controllersTextSet = true;
           }
 

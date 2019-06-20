@@ -14,6 +14,15 @@ List<ProductList> productListsReducer(List<ProductList> productLists, action) {
   } else if (action is UpdateProductListAction) {
     productLists[action.index] =
         productListReducer(productLists[action.index], action);
+  } else if (action is AddProductListLabelAction) {
+    var labels = productLists[action.listIndex].labels;
+    labels = productListLabelsReducer(labels, action);
+
+  } else if (action is DeleteProductListLabelAction) {
+    var labels = productLists[action.listIndex].labels;
+    labels = productListLabelsReducer(labels, action);
+    productLists[action.listIndex] = 
+        productListReducer(productLists[action.listIndex], action);
 
   } else if (action is DeleteProductListItemAction) {
     productLists[action.listIndex] =
@@ -45,18 +54,34 @@ List<ProductList> productListsReducer(List<ProductList> productLists, action) {
   return productLists;
 }
 
-ProductList productListReducer(ProductList prodcutList, action) {
-  if (action is AddToProductListAction) {
-    prodcutList.list.add(action.productListItem);
-  } else if (action is UpdateProductListItemAction) {
-    prodcutList.list[action.itemIndex] = action.newProductListItem;
-  } else if (action is UpdateProductListAction) {
-    prodcutList.name = action.name;
-    prodcutList.note = action.note;
-  } else if (action is DeleteProductListItemAction) {
-    prodcutList.list.removeAt(action.itemIndex);
-  } else if (action is DeleteAllProductListItemsAction) {
-    prodcutList.list.clear();
+List<ColorLabel> productListLabelsReducer(List<ColorLabel> labels, action) {
+  if (action is AddProductListLabelAction) {
+    labels.add(action.label);
+  } else if (action is DeleteProductListLabelAction) {
+    labels.removeAt(action.labelIndex);
   }
-  return prodcutList;
+  return labels;
+}
+
+ProductList productListReducer(ProductList productList, action) {
+  if (action is AddToProductListAction) {
+    productList.list.add(action.productListItem);
+  } else if (action is UpdateProductListItemAction) {
+    productList.list[action.itemIndex] = action.newProductListItem;
+  } else if (action is UpdateProductListAction) {
+    productList.name = action.name;
+    productList.note = action.note;
+  } else if (action is DeleteProductListLabelAction) {
+    productList.list = productList.list.map((item) {
+      if (item.labelIndex == action.labelIndex) {
+        item.labelIndex = null;
+      }
+      return item;
+    }).toList();
+  } else if (action is DeleteProductListItemAction) {
+    productList.list.removeAt(action.itemIndex);
+  } else if (action is DeleteAllProductListItemsAction) {
+    productList.list.clear();
+  }
+  return productList;
 }
