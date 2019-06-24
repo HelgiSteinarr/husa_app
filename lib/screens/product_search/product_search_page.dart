@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:husa_app/screens/product_search/product_find_from_scan.dart';
 import 'package:husa_app/utilities/common.dart';
 import 'package:husa_app/widgets/SearchBarButton.dart';
 import 'package:redux/redux.dart';
@@ -52,6 +53,23 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
         });
   }
 
+  void openScanMenu(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductFindFromScanScreen(
+              onCodeFound: (Product product) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProductInfoScreen(product: product)));
+              },
+            ),
+      ),
+    );
+  }
+
   Widget searchResultBuilder(
       BuildContext context, int position, _ViewModel vm) {
     var product = vm.productData[vm.searchResult.productIndexes[position]];
@@ -71,17 +89,40 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     );
   }
 
+  Widget buildPopupMenuButton(BuildContext context, _ViewModel vm) {
+    return PopupMenuButton<int>(
+      child: SearchBarButton(
+        icon: Icons.list,
+      ),
+      onSelected: (int position) {
+        switch (position) {
+          case 0:
+            changeSearchTypes(context, vm);
+            break;
+          case 1:
+            openScanMenu(context);
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => [
+            PopupMenuItem(
+              value: 0,
+              child: Text("Leita eftir"),
+            ),
+            PopupMenuItem(
+              value: 1,
+              child: Text("Nota skanna"),
+            )
+          ],
+    );
+  }
+
   Widget buildSearchBox(BuildContext context, _ViewModel vm) {
     return Container(
       height: 45,
       child: Row(
         children: <Widget>[
-          SearchBarButton(
-            icon: Icons.filter_list,
-            onTap: () {
-              changeSearchTypes(context, vm);
-            },
-          ),
+          buildPopupMenuButton(context, vm),
           Expanded(
               child: TextField(
             controller: searchTextController,

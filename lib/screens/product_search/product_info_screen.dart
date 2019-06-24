@@ -12,7 +12,7 @@ class ProductInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Upplýsingar um vöru")),
-      body: Column(
+      body: ListView(
         children: <Widget>[
           Padding(
               padding: EdgeInsets.all(10.0),
