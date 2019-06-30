@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:husa_app/screens/settings/settings_info_page.dart';
 import 'package:husa_app/utilities/product_data_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
@@ -57,35 +58,62 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, _ViewModel>(
-        // Rather than build a method here, we'll defer this
-        // responsibilty to the _viewModel.
         converter: _ViewModel.fromStore,
-        // Our builder now takes in a _viewModel as a second arg
         builder: (BuildContext context, _ViewModel vm) {
+          final List<_SettingsItem> settingsItems = [
+            _SettingsItem(
+                title: "Uppfæra vörur frá síðu (husa.is)",
+                onTap: () {
+                  showUpdateProductDataView(context, vm);
+                }),
+            _SettingsItem(
+                title: "Setja vörulista á síðu",
+                onTap: () {
+                  templUploadProductLists(vm);
+                }),
+            _SettingsItem(
+                title: "Um þetta app",
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsInfoPage()));
+                }),
+          ];
+
           return Scaffold(
             appBar: AppBar(title: Text("Stillingar")),
-            body: ListView(
-              children: <Widget>[
-                ListTile(
-                  title: Text("Uppfæra vörur frá síðu"),
-                  onTap: () {
-                    showUpdateProductDataView(context, vm);
-                  },
-                ),
-                ListTile(
-                  title: Text("Uploada vöurlistum",
-                      style: TextStyle(color: Colors.red)),
-                  onTap: () {
-                    templUploadProductLists(vm);
-                  },
-                ),
-              ],
+            body: ListView.separated(
+              separatorBuilder: (context, position) {
+                return Divider(
+                  color: Colors.black26,
+                );
+              },
+              itemCount: settingsItems.length,
+              itemBuilder: (context, position) {
+                return ListTile(
+                  title: Text(settingsItems[position].title),
+                  onTap: settingsItems[position].onTap,
+                );
+              },
             ),
           );
         });
   }
 }
 
+// MARK: SettingsItem
+class _SettingsItem {
+  String title;
+  Function onTap;
+
+  _SettingsItem({
+    this.title,
+    this.onTap,
+  });
+}
+
+// MARK: ViewModel
 class _ViewModel {
   final List<ProductList> productLists;
   final Store<AppState> store;

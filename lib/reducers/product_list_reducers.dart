@@ -33,7 +33,7 @@ List<ProductList> productListsReducer(List<ProductList> productLists, action) {
         productListReducer(productLists[action.listIndex], action);
 
   } else if (action is AddProductListAction) {
-    productLists.add(ProductList(name: action.name, list: List()));
+    productLists.add(ProductList(name: action.name, list: List(), labels: List()));
 
   } else if (action is CopyProductListItemAction) {
     var productListItem = productLists[action.originalListIndex].list[action.itemIndex];
