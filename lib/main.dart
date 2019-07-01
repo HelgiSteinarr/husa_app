@@ -15,10 +15,10 @@ class AppRoot extends StatefulWidget {
   AppRoot({Key key}) : super(key: key);
 
   @override
-  _AppRootState createState() => _AppRootState();
+  AppRootState createState() => AppRootState();
 }
 
-class _AppRootState extends State<AppRoot> {
+class AppRootState extends State<AppRoot> {
   final store = new Store<AppState>(
     rootReducer,
     initialState: new AppState(
@@ -36,6 +36,10 @@ class _AppRootState extends State<AppRoot> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void restartApp() {
+    this.setState(() {});
   }
 
   @override

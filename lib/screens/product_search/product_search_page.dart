@@ -70,8 +70,8 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     );
   }
 
-  Widget searchResultBuilder(
-      BuildContext context, int position, _ViewModel vm) {
+  // MARK: Build
+  Widget buildSearchResult(BuildContext context, int position, _ViewModel vm) {
     var product = vm.productData[vm.searchResult.productIndexes[position]];
     return ListTile(
       title: Text(product.name),
@@ -90,20 +90,25 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   }
 
   Widget buildPopupMenuButton(BuildContext context, _ViewModel vm) {
+    final productDataLoaded = vm.productData.length > 0;
+
     return PopupMenuButton<int>(
       child: SearchBarButton(
         icon: Icons.list,
+        enabled: productDataLoaded,
       ),
-      onSelected: (int position) {
-        switch (position) {
-          case 0:
-            changeSearchTypes(context, vm);
-            break;
-          case 1:
-            openScanMenu(context);
-            break;
-        }
-      },
+      onSelected: productDataLoaded
+          ? (int position) {
+              switch (position) {
+                case 0:
+                  changeSearchTypes(context, vm);
+                  break;
+                case 1:
+                  openScanMenu(context);
+                  break;
+              }
+            }
+          : null,
       itemBuilder: (BuildContext context) => [
             PopupMenuItem(
               value: 0,
@@ -118,6 +123,8 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   }
 
   Widget buildSearchBox(BuildContext context, _ViewModel vm) {
+    final productDataLoaded = vm.productData.length > 0;
+
     return Container(
       height: 45,
       child: Row(
@@ -132,10 +139,12 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               fillColor: Colors.white,
               border: InputBorder.none,
             ),
+            enabled: productDataLoaded,
             style: TextStyle(),
           )),
           SearchBarButton(
             icon: searchBarEndIcon,
+            enabled: productDataLoaded,
             onTap: () {
               if (searchBarEndIcon == Icons.close) {
                 searchTextController.text = "";
@@ -151,13 +160,36 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     );
   }
 
+  Widget buildBody(BuildContext context, _ViewModel vm) {
+    if (vm.productData.length > 0) {
+      return Container(
+        child: Column(
+          children: <Widget>[
+            Expanded(
+                child: ListView.separated(
+              separatorBuilder: (context, index) {
+                return Divider(
+                  color: Colors.black26,
+                );
+              },
+              itemCount: vm.searchResult.productIndexes.length,
+              itemBuilder: (BuildContext context, int position) =>
+                  buildSearchResult(context, position, vm),
+            )),
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new StoreConnector<AppState, _ViewModel>(
-        // Rather than build a method here, we'll defer this
-        // responsibilty to the _viewModel.
         converter: _ViewModel.fromStore,
-        // Our builder now takes in a _viewModel as a second arg
         builder: (BuildContext context, _ViewModel vm) {
           if (firstTime) {
             searchTextController.text = vm.searchResult.searchString;
@@ -169,7 +201,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               }
               vm.store.dispatch(SearchProductDataAction(
                 searchString: searchTextController.text,
-                searchTypes: vm.store.state.productSearchResult.searchTypes,
+                searchTypes: vm.searchResult.searchTypes,
               ));
             });
 
@@ -185,23 +217,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               centerTitle: true,
               title: buildSearchBox(context, vm),
             ),
-            body: Container(
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                      child: ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return Divider(
-                        color: Colors.black26,
-                      );
-                    },
-                    itemCount: vm.searchResult.productIndexes.length,
-                    itemBuilder: (BuildContext context, int position) =>
-                        searchResultBuilder(context, position, vm),
-                  )),
-                ],
-              ),
-            ),
+            body: buildBody(context, vm),
           );
         });
   }

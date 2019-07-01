@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:husa_app/actions/product_data_actions.dart';
 import 'package:husa_app/actions/product_list_actions.dart';
 import 'package:husa_app/models/app_state.dart';
+import 'package:husa_app/models/product_data.dart';
 import 'package:husa_app/screens/product_lists/product_lists_page.dart';
 import 'package:husa_app/screens/product_search/product_search_page.dart';
 import 'package:husa_app/screens/settings/settings_page.dart';
+import 'package:husa_app/utilities/common.dart';
 import 'package:husa_app/utilities/product_data_manager.dart';
 import 'package:husa_app/utilities/save_manager.dart';
 import 'package:husa_app/widgets/UpdateDataDialog.dart';
 import 'package:redux/redux.dart';
-
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -19,7 +21,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   final List<Widget> pages = [
     ProductSearchPage(),
     ProductListsPage(),
@@ -52,8 +53,12 @@ class _MainScreenState extends State<MainScreen> {
   Future loadProductData(BuildContext context, _ViewModel vm) async {
     var productDataManager = ProductDataManager(store: vm.store);
     if (!(await productDataManager.loadFile())) {
-      showUpdateProductDataView(context, vm);
+      await showUpdateProductDataView(context, vm);
     }
+    vm.store.dispatch(SearchProductDataAction(
+      searchString: "",
+      searchTypes: vm.productSearchResult.searchTypes,
+    ));
   }
 
   void loadProductLists(_ViewModel vm) async {
@@ -66,13 +71,12 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void onTabTap(int index)
-  {
+  void onTabTap(int index) {
     setState(() {
       currentIndex = index;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, _ViewModel>(
@@ -99,24 +103,26 @@ class _MainScreenState extends State<MainScreen> {
                   icon: Icon(Icons.settings), title: Text("Stillingar")),
             ], currentIndex: currentIndex, onTap: onTabTap),
           );
-      }
-    );
+        });
   }
 }
 
 class _ViewModel {
   final Store<AppState> store;
   final bool appReady;
+  final ProductDataSearchResult productSearchResult;
 
   _ViewModel({
     @required this.store,
     @required this.appReady,
+    @required this.productSearchResult,
   });
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       store: store,
       appReady: store.state.appReady,
+      productSearchResult: store.state.productSearchResult,
     );
   }
 }

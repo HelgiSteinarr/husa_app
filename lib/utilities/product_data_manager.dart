@@ -100,13 +100,9 @@ class ProductDataManager {
   Future<bool> update() async {
     print("Updating");
     try {
-      print("Extracting cat urls");
       await _extractCatUrls();
-      print("Extracting cat ids");
       await _extractCatIds();
-      print("Extracting subcat urls");
       await _extractSubCatIds();
-      print("Extracting product info");
       await _extractProductInfo();
       await _save();
       _updateStore();
