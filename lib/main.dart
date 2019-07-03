@@ -27,7 +27,10 @@ class AppRootState extends State<AppRoot> {
         productSearchResult: ProductDataSearchResult(
             productIndexes: List(),
             searchString: "",
-            searchTypes: [ProductDataSearchType.productNumber, ProductDataSearchType.name]),
+            searchTypes: [
+              ProductDataSearchType.productNumber,
+              ProductDataSearchType.name
+            ]),
         productLists: List(),
         productData: List()),
     middleware: []..add(createSaveMiddleware())..add(createSearchMiddleware()),
@@ -50,6 +53,12 @@ class AppRootState extends State<AppRoot> {
           title: 'Húsasmiðjan',
           theme: ThemeData(
             primarySwatch: Colors.red,
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+              },
+            ),
           ),
           home: MainScreen(),
         ));
