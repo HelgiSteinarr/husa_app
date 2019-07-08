@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:husa_app/screens/settings/settings_info_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'settings_info_page.dart';
+import 'settings_account_screen.dart';
 
 import '../../utilities/product_data_manager.dart';
 import '../../widgets/UpdateDataDialog.dart';
@@ -74,6 +75,15 @@ class _SettingsPageState extends State<SettingsPage> {
         converter: _ViewModel.fromStore,
         builder: (BuildContext context, _ViewModel vm) {
           final List<_SettingsItem> settingsItems = [
+            _SettingsItem(
+              title: "Aðgangur",
+              onTap: () {
+                Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsAccountScreen()));
+              }
+            ),
             _SettingsItem(
                 title: "Uppfæra vörur frá síðu (husa.is)",
                 onTap: () {

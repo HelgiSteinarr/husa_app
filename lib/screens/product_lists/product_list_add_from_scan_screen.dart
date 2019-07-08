@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:husa_app/actions/app_actions.dart';
 import 'package:qr_mobile_vision/qr_camera.dart';
 import '../../models/app_state.dart';
+import '../../actions/app_actions.dart';
 import '../../actions/product_list_actions.dart';
 import '../../models/product_list.dart';
 import '../../widgets/ConfirmDialog.dart';

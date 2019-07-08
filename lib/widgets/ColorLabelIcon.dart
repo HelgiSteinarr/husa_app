@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:husa_app/models/product_list.dart';
+import '../models/product_list.dart';
 
 class ColorLabelIcon extends StatelessWidget {
   ColorLabelIcon({Key key, this.label}) : super(key: key);

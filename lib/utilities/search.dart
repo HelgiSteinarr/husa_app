@@ -1,5 +1,5 @@
-import 'package:husa_app/actions/product_data_actions.dart';
 import 'package:redux/redux.dart';
+import '../actions/product_data_actions.dart';
 import '../actions/app_actions.dart';
 import '../models/product_data.dart';
 import '../models/app_state.dart';

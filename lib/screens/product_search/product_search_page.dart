@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:husa_app/screens/product_search/product_find_from_scan.dart';
-import 'package:husa_app/utilities/common.dart';
-import 'package:husa_app/widgets/SearchBarButton.dart';
 import 'package:redux/redux.dart';
 import 'product_info_screen.dart';
+import '../product_search/product_find_from_scan.dart';
+import '../../utilities/common.dart';
+import '../../widgets/SearchBarButton.dart';
 import '../../models/app_state.dart';
 import '../../actions/product_data_actions.dart';
 import '../../models/product_data.dart';

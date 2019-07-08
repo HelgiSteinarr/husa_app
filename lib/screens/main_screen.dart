@@ -1,17 +1,17 @@
+import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:husa_app/actions/product_data_actions.dart';
-import 'package:husa_app/actions/product_list_actions.dart';
-import 'package:husa_app/models/app_state.dart';
-import 'package:husa_app/models/product_data.dart';
-import 'package:husa_app/screens/product_lists/product_lists_page.dart';
-import 'package:husa_app/screens/product_search/product_search_page.dart';
-import 'package:husa_app/screens/settings/settings_page.dart';
-import 'package:husa_app/utilities/common.dart';
-import 'package:husa_app/utilities/product_data_manager.dart';
-import 'package:husa_app/utilities/save_manager.dart';
-import 'package:husa_app/widgets/UpdateDataDialog.dart';
-import 'package:redux/redux.dart';
+
+import 'product_lists/product_lists_page.dart';
+import 'product_search/product_search_page.dart';
+import 'settings/settings_page.dart';
+import '../actions/product_data_actions.dart';
+import '../actions/product_list_actions.dart';
+import '../models/app_state.dart';
+import '../models/product_data.dart';
+import '../utilities/product_data_manager.dart';
+import '../utilities/save_manager.dart';
+import '../widgets/UpdateDataDialog.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);

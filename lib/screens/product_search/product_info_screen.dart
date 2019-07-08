@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:husa_app/utilities/common.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../utilities/common.dart';
 import '../../models/product_data.dart';
 
 class ProductInfoScreen extends StatelessWidget {

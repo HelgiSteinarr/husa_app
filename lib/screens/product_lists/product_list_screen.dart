@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:husa_app/screens/product_lists/product_list_add_from_scan_screen.dart';
-import 'package:husa_app/widgets/ColorLabelIcon.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:husa_app/actions/app_actions.dart';
-import 'package:husa_app/screens/product_lists/product_list_item_screen.dart';
 import 'product_list_info_screen.dart';
+import '../product_lists/product_list_item_screen.dart';
 import '../../models/app_state.dart';
+import '../../actions/app_actions.dart';
+import '../../screens/product_lists/product_list_add_from_scan_screen.dart';
+import '../../widgets/ColorLabelIcon.dart';
 import '../../actions/product_list_actions.dart';
 import '../../models/product_list.dart';
 import '../../models/product_data.dart';

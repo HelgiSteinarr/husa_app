@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:husa_app/actions/product_data_actions.dart';
-import 'package:husa_app/models/product_data.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'utilities/search.dart';
@@ -8,6 +6,8 @@ import 'screens/main_screen.dart';
 import 'models/app_state.dart';
 import 'reducers/root_reducer.dart';
 import 'utilities/save_manager.dart';
+import 'actions/product_data_actions.dart';
+import 'models/product_data.dart';
 
 void main() => runApp(AppRoot());
 
@@ -32,7 +32,8 @@ class AppRootState extends State<AppRoot> {
               ProductDataSearchType.name
             ]),
         productLists: List(),
-        productData: List()),
+        productData: List(),
+        currentUser: null),
     middleware: []..add(createSaveMiddleware())..add(createSearchMiddleware()),
   );
 
