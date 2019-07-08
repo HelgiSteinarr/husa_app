@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'common.dart';
 
 import '../models/app_state.dart';
 import '../models/user.dart';
@@ -15,8 +16,33 @@ class UserManager {
 
   UserManager({this.store, this.currentUser});
 
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+  Future<File> get _userDataFile async {
+    final path = await _localPath;
+    return File('$path/userData.json');
+  }
+
   String get bearerAuthHeader {
     return 'Bearer ${currentUser?.token ?? ''}';
+  }
+
+  void writeToFile(String content) async {
+    final file = await _userDataFile;
+    file.writeAsString(content);
+  }
+
+  Future<String> readFromFile() async {
+    final file = await _userDataFile;
+    if (!(await file.exists())) throw FileDoesNotExistException("File does not exists");
+    return await file.readAsString();
+  }
+
+  void saveCurrentUser() {
+    writeToFile(jsonEncode(currentUser.toJsonObject()));
   }
 
   Future login(String username, String password) async {
@@ -29,8 +55,9 @@ class UserManager {
       final Map jsonResponse = jsonDecode(response.body);
 
       currentUser =
-          User(name: "", username: username, token: jsonResponse["token"]);
-
+          User(name: jsonResponse["name"], username: username, token: jsonResponse["token"]);
+      
+      saveCurrentUser();
       store.dispatch(UpdateUserAction(user: currentUser));
     } else {
       return null;
@@ -45,10 +72,24 @@ class UserManager {
     );
     if (response.statusCode == 200) {
       store.dispatch(UpdateUserAction(user: null));
+      writeToFile("");
     }
   }
 
-  Future uploadProductLists() async {
+  Future loadUserFromFile() async {
+    try {
+      final userJsonData = await readFromFile();
+      if (userJsonData == "") return;
+      Map userJsonObject = json.decode(userJsonData);
+      currentUser = User.fromJsonObject(userJsonObject);
+      
+      store.dispatch(UpdateUserAction(user: currentUser));
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<bool> uploadProductLists() async {
     final directory = await getApplicationDocumentsDirectory();
     final formData = FormData.from({
       "file": new UploadFileInfo(
@@ -56,16 +97,15 @@ class UserManager {
     });
 
     final response =
-        await Dio().post("10.0.2.2:8080/api/productLists/upload",
+        await Dio().post("http://10.0.2.2:8080/api/productLists/upload",
             data: formData,
             options: Options(headers: {
               HttpHeaders.authorizationHeader: bearerAuthHeader,
             }));
-  
-    final Map jsonResponse = jsonDecode(response.data);
-    if (jsonResponse != null &&
-        jsonResponse.containsKey("error") &&
-        jsonResponse["error"] == 0) {
-    } else {}
+    if (response.data != null &&
+        response.data['success'] == 1) {
+          return true;
+    }
+    return false;
   }
 }

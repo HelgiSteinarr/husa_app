@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'product_lists/product_lists_page.dart';
 import 'product_search/product_search_page.dart';
 import 'settings/settings_page.dart';
+import '../utilities/user_manager.dart';
 import '../actions/product_data_actions.dart';
 import '../actions/product_list_actions.dart';
 import '../models/app_state.dart';
@@ -71,6 +72,11 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  Future loadUserData(_ViewModel vm) async {
+    final userManager = UserManager(store: vm.store);
+    await userManager.loadUserFromFile();
+  }
+
   void onTabTap(int index) {
     setState(() {
       currentIndex = index;
@@ -88,6 +94,7 @@ class _MainScreenState extends State<MainScreen> {
                 if (firstTime && !vm.appReady) {
                   loadProductData(context, vm);
                   loadProductLists(vm);
+                  loadUserData(vm);
                   firstTime = false;
                 }
 

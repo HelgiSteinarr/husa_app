@@ -122,8 +122,8 @@ class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
               shape: BoxShape.circle,
             ),
           ),
-          title: Text(vm.currentUser.username),
-          subtitle: Text(""),
+          title: Text(vm.currentUser.name),
+          subtitle: Text(vm.currentUser.username),
         ),
         ListTile(
           title: Text("Setja vörulista á síðu"),
@@ -144,7 +144,7 @@ class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
         builder: (BuildContext context, _ViewModel vm) {
           return Scaffold(
             appBar:
-                AppBar(title: Text(vm.currentUser?.username ?? "Innskráning")),
+                AppBar(title: Text(vm.currentUser?.name ?? "Innskráning")),
             body: vm.currentUser != null
                 ? buildAccountSignedInBody(context, vm)
                 : buildAccountSignedOutBody(context, vm),
