@@ -21,6 +21,7 @@ class UserManager {
 
     return directory.path;
   }
+
   Future<File> get _userDataFile async {
     final path = await _localPath;
     return File('$path/userData.json');
@@ -37,7 +38,8 @@ class UserManager {
 
   Future<String> readFromFile() async {
     final file = await _userDataFile;
-    if (!(await file.exists())) throw FileDoesNotExistException("File does not exists");
+    if (!(await file.exists()))
+      throw FileDoesNotExistException("File does not exists");
     return await file.readAsString();
   }
 
@@ -54,13 +56,29 @@ class UserManager {
     if (response.statusCode == 200) {
       final Map jsonResponse = jsonDecode(response.body);
 
-      currentUser =
-          User(name: jsonResponse["name"], username: username, token: jsonResponse["token"]);
-      
+      currentUser = User(
+          name: jsonResponse["name"],
+          username: username,
+          token: jsonResponse["token"]);
+
       saveCurrentUser();
       store.dispatch(UpdateUserAction(user: currentUser));
     } else {
       return null;
+    }
+  }
+
+  Future create(String name, String username, String password,
+      String verifyPassword) async {
+    final response =
+        await http.post(Uri.http("10.0.2.2:8080", "/api/user/create"), body: {
+      'name': name,
+      'username': username,
+      'password': password,
+      'verifyPassword': verifyPassword
+    });
+    if (response.statusCode == 200) {
+      await login(username, password);
     }
   }
 
@@ -82,7 +100,7 @@ class UserManager {
       if (userJsonData == "") return;
       Map userJsonObject = json.decode(userJsonData);
       currentUser = User.fromJsonObject(userJsonObject);
-      
+
       store.dispatch(UpdateUserAction(user: currentUser));
     } catch (error) {
       print(error);
@@ -102,9 +120,8 @@ class UserManager {
             options: Options(headers: {
               HttpHeaders.authorizationHeader: bearerAuthHeader,
             }));
-    if (response.data != null &&
-        response.data['success'] == 1) {
-          return true;
+    if (response.data != null && response.data['success'] == 1) {
+      return true;
     }
     return false;
   }

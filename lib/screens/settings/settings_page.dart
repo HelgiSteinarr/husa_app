@@ -13,6 +13,7 @@ import '../../widgets/UpdateDataDialog.dart';
 import '../../models/product_list.dart';
 import '../../widgets/WaitDialog.dart';
 import '../../models/app_state.dart';
+import '../../models/user.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);
@@ -75,25 +76,50 @@ class _SettingsPageState extends State<SettingsPage> {
         converter: _ViewModel.fromStore,
         builder: (BuildContext context, _ViewModel vm) {
           final List<_SettingsItem> settingsItems = [
-            _SettingsItem(
-              title: "Aðgangur",
-              onTap: () {
-                Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SettingsAccountScreen()));
-              }
-            ),
+            (vm.currentUser != null)
+                ? _SettingsItem(
+                    customContent: ListTile(
+                      leading: Container(
+                        width: 50.0,
+                        height: 50.0,
+                        child: Icon(
+                          Icons.person,
+                          size: 48.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      title: Text(vm.currentUser.name),
+                      subtitle: Text(vm.currentUser.username),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SettingsAccountScreen()));
+                      },
+                    ),
+                  )
+                : _SettingsItem(
+                    title: "Innskráning",
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SettingsAccountScreen()));
+                    },
+                  ),
             _SettingsItem(
                 title: "Uppfæra vörur frá síðu (husa.is)",
                 onTap: () {
                   showUpdateProductDataView(context, vm);
                 }),
-            _SettingsItem(
+            /*_SettingsItem(
                 title: "Setja vörulista á síðu",
                 onTap: () {
                   templUploadProductLists(context, vm);
-                }),
+                }),*/
             _SettingsItem(
                 title: "Um þetta app",
                 onTap: () {
@@ -114,9 +140,13 @@ class _SettingsPageState extends State<SettingsPage> {
               },
               itemCount: settingsItems.length,
               itemBuilder: (context, position) {
+                final settingsItem = settingsItems[position];
+                if (settingsItem.customContent != null) {
+                  return settingsItem.customContent;
+                }
                 return ListTile(
-                  title: Text(settingsItems[position].title),
-                  onTap: settingsItems[position].onTap,
+                  title: Text(settingsItem.title),
+                  onTap: settingsItem.onTap,
                 );
               },
             ),
@@ -129,26 +159,31 @@ class _SettingsPageState extends State<SettingsPage> {
 class _SettingsItem {
   String title;
   Function onTap;
+  Widget customContent;
 
   _SettingsItem({
     this.title,
     this.onTap,
+    this.customContent,
   });
 }
 
 // MARK: ViewModel
 class _ViewModel {
   final List<ProductList> productLists;
+  final User currentUser;
   final Store<AppState> store;
 
   _ViewModel({
     @required this.productLists,
+    @required this.currentUser,
     @required this.store,
   });
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       productLists: store.state.productLists,
+      currentUser: store.state.currentUser,
       store: store,
     );
   }
