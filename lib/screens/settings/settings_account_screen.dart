@@ -83,6 +83,7 @@ class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
                                       decoration: InputDecoration(
                                           labelText: "Lykilorð"),
                                       controller: passwordController,
+                                      obscureText: true,
                                     ))),
                             Padding(
                               padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
