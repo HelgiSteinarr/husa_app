@@ -13,6 +13,7 @@ import '../models/user.dart';
 class UserManager {
   Store<AppState> store;
   User currentUser;
+  String baseURL = "https://vorulistar.gudmunduro.com";
 
   UserManager({this.store, this.currentUser});
 
@@ -51,7 +52,7 @@ class UserManager {
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     final response = await http.post(
-        Uri.http("10.0.2.2:8080", "/api/user/login"),
+        Uri.http(baseURL, "/api/user/login"),
         headers: {'authorization': basicAuth});
     if (response.statusCode == 200) {
       final Map jsonResponse = jsonDecode(response.body);
@@ -71,7 +72,7 @@ class UserManager {
   Future create(String name, String username, String password,
       String verifyPassword) async {
     final response =
-        await http.post(Uri.http("10.0.2.2:8080", "/api/user/create"), body: {
+        await http.post(Uri.http(baseURL, "/api/user/create"), body: {
       'name': name,
       'username': username,
       'password': password,
@@ -85,7 +86,7 @@ class UserManager {
   Future logout() async {
     print(bearerAuthHeader);
     final response = await http.get(
-      Uri.http("10.0.2.2:8080", "/api/user/logout"),
+      Uri.http(baseURL, "/api/user/logout"),
       headers: {'Authorization': bearerAuthHeader},
     );
     if (response.statusCode == 200) {
@@ -115,7 +116,7 @@ class UserManager {
     });
 
     final response =
-        await Dio().post("http://10.0.2.2:8080/api/productLists/upload",
+        await Dio().post("$baseURL/api/productLists/upload",
             data: formData,
             options: Options(headers: {
               HttpHeaders.authorizationHeader: bearerAuthHeader,
