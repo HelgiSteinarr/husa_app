@@ -2,45 +2,49 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../user/user_create_screen.dart';
+import 'user_create_screen.dart';
 import '../../models/user.dart';
 import '../../models/app_state.dart';
 import '../../widgets/WaitDialog.dart';
+import '../../widgets/SimpleAlertDialog.dart';
 import '../../utilities/user_manager.dart';
 
-class SettingsAccountScreen extends StatefulWidget {
-  SettingsAccountScreen({Key key}) : super(key: key);
+class UserLoginScreen extends StatefulWidget {
+  UserLoginScreen({Key key}) : super(key: key);
 
   @override
-  _SettingsAccountScreenState createState() => _SettingsAccountScreenState();
+  _UserLoginScreenState createState() => _UserLoginScreenState();
 }
 
-class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
+class _UserLoginScreenState extends State<UserLoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void login(_ViewModel vm) {
+  Future login(BuildContext context, _ViewModel vm) async {
     final userManager = UserManager(store: vm.store);
-    userManager.login(usernameController.text, passwordController.text);
+    await userManager.login(usernameController.text, passwordController.text);
+    if (vm.store.state.currentUser != null) Navigator.pop(context);
+    else {
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return SimpleAlertDialog(
+              title: Text("Innskráning tókst ekki"),
+            );
+          }
+        );
+    }
   }
 
-  void logout(_ViewModel vm) {
-    final userManager =
-        UserManager(store: vm.store, currentUser: vm.currentUser);
-    userManager.logout();
+  Future createAccount(BuildContext context, _ViewModel vm) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => UserCreateScreen()));
+    if (vm.store.state.currentUser != null) {
+      Navigator.pop(context);
+    }
   }
 
-  Future uploadProductLists(BuildContext context, _ViewModel vm) async {
-    final userManager =
-        UserManager(store: vm.store, currentUser: vm.currentUser);
-    var result = userManager.uploadProductLists();
-    await showDialog(
-      context: context,
-      builder: (context) => WaitDialog(waitFor: result),
-    );
-  }
-
-  Widget buildAccountSignedOutBody(BuildContext context, _ViewModel vm) {
+  Widget buildBody(BuildContext context, _ViewModel vm) {
     return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -97,7 +101,7 @@ class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
                                     child: Text("Innskrá"),
                                     color: Colors.red,
                                     textColor: Colors.white,
-                                    onPressed: () => login(vm),
+                                    onPressed: () => login(context, vm),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(
@@ -105,13 +109,7 @@ class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
                                   ),
                                   RaisedButton(
                                     child: Text("Nýskrá"),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  UserCreateScreen()));
-                                    },
+                                    onPressed: () => createAccount(context, vm),
                                   ),
                                 ],
                               ),
@@ -120,47 +118,13 @@ class _SettingsAccountScreenState extends State<SettingsAccountScreen> {
                         ))))));
   }
 
-  Widget buildAccountSignedInBody(BuildContext context, _ViewModel vm) {
-    return ListView(
-      children: <Widget>[
-        ListTile(
-          leading: Container(
-            width: 50.0,
-            height: 50.0,
-            child: Icon(
-              Icons.person,
-              size: 48.0,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-          title: Text(vm.currentUser.name),
-          subtitle: Text(vm.currentUser.username),
-        ),
-        ListTile(
-          title: Text("Setja vörulista á síðu"),
-          onTap: () => uploadProductLists(context, vm),
-        ),
-        ListTile(
-          title: Text("Skrá út"),
-          onTap: () => logout(vm),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, _ViewModel>(
         converter: _ViewModel.fromStore,
         builder: (BuildContext context, _ViewModel vm) {
           return Scaffold(
-            appBar: AppBar(),
-            body: vm.currentUser != null
-                ? buildAccountSignedInBody(context, vm)
-                : buildAccountSignedOutBody(context, vm),
+            body: buildBody(context, vm),
           );
         });
   }

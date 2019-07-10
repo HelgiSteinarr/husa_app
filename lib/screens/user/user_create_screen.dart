@@ -5,16 +5,17 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../../models/user.dart';
 import '../../models/app_state.dart';
 import '../../widgets/WaitDialog.dart';
+import '../../widgets/SimpleAlertDialog.dart';
 import '../../utilities/user_manager.dart';
 
-class SettingsAccountCreateScreen extends StatefulWidget {
-  SettingsAccountCreateScreen({Key key}) : super(key: key);
+class UserCreateScreen extends StatefulWidget {
+  UserCreateScreen({Key key}) : super(key: key);
 
   @override
-  _SettingsAccountCreateScreenState createState() => _SettingsAccountCreateScreenState();
+  _UserCreateScreenState createState() => _UserCreateScreenState();
 }
 
-class _SettingsAccountCreateScreenState extends State<SettingsAccountCreateScreen> {
+class _UserCreateScreenState extends State<UserCreateScreen> {
   final nameController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -24,6 +25,16 @@ class _SettingsAccountCreateScreenState extends State<SettingsAccountCreateScree
     final userManager = UserManager(store: vm.store);
     await userManager.create(nameController.text, usernameController.text, passwordController.text, verifyPasswordController.text);
     if (vm.store.state.currentUser != null) Navigator.pop(context);
+    else {
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return SimpleAlertDialog(
+              title: Text("Tókst ekki að búa til aðgang"),
+            );
+          }
+        );
+    }
   }
 
   Widget buildBody(BuildContext context, _ViewModel vm) {

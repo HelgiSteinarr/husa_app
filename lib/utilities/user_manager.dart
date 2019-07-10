@@ -10,6 +10,13 @@ import 'common.dart';
 import '../models/app_state.dart';
 import '../models/user.dart';
 
+enum UserStatus {
+  loggedIn,
+  loggoutOut,
+  banned,
+  error
+}
+
 class UserManager {
   Store<AppState> store;
   User currentUser;
@@ -48,7 +55,7 @@ class UserManager {
     writeToFile(jsonEncode(currentUser.toJsonObject()));
   }
 
-  Future login(String username, String password) async {
+  Future<bool> login(String username, String password) async {
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     final response = await http.post(
@@ -64,8 +71,9 @@ class UserManager {
 
       saveCurrentUser();
       store.dispatch(UpdateUserAction(user: currentUser));
+      return true;
     } else {
-      return null;
+      return false;
     }
   }
 
@@ -78,28 +86,45 @@ class UserManager {
       'password': password,
       'verifyPassword': verifyPassword
     });
-    print(response.statusCode);
     if (response.statusCode == 200) {
-      print(response.body);
       await login(username, password);
     }
   }
 
   Future logout() async {
-    print(bearerAuthHeader);
     final response = await http.get(
       Uri.https(baseURL, "/api/user/logout"),
       headers: {'Authorization': bearerAuthHeader},
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 401) {
       store.dispatch(UpdateUserAction(user: null));
       writeToFile("");
     }
   }
 
+  Future<UserStatus> verifyUser() async {
+    final response = await http.get(
+      Uri.https(baseURL, "/api/user/info"),
+      headers: {'Authorization': bearerAuthHeader},
+    );
+    if (response.statusCode == 200) {
+      return UserStatus.loggedIn;
+    } else if (response.statusCode == 401) {
+      store.dispatch(UpdateUserAction(user: null));
+      writeToFile("");
+      return UserStatus.loggoutOut;
+    } else if (response.statusCode == 403) {
+      store.dispatch(UpdateUserAction(user: null));
+      writeToFile("");
+      return UserStatus.banned;
+    }
+    return UserStatus.error;
+  }
+
   Future loadUserFromFile() async {
     try {
       final userJsonData = await readFromFile();
+      print(userJsonData);
       if (userJsonData == "") return;
       Map userJsonObject = json.decode(userJsonData);
       currentUser = User.fromJsonObject(userJsonObject);
@@ -123,8 +148,11 @@ class UserManager {
             options: Options(headers: {
               HttpHeaders.authorizationHeader: bearerAuthHeader,
             }));
-    if (response.data != null && response.data['success'] == 1) {
+    if (response.statusCode == 200 && response.data != null && response.data['success'] == 1) {
       return true;
+    }
+    if (response.statusCode == 401) {
+      await logout();
     }
     return false;
   }

@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'product_lists/product_lists_page.dart';
 import 'product_search/product_search_page.dart';
 import 'settings/settings_page.dart';
+import 'user/user_login_screen.dart';
 import '../utilities/user_manager.dart';
 import '../actions/product_data_actions.dart';
 import '../actions/product_list_actions.dart';
@@ -13,6 +14,8 @@ import '../models/product_data.dart';
 import '../utilities/product_data_manager.dart';
 import '../utilities/save_manager.dart';
 import '../widgets/UpdateDataDialog.dart';
+import '../widgets/SimpleAlertDialog.dart';
+import '../models/user.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -62,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
     ));
   }
 
-  void loadProductLists(_ViewModel vm) async {
+  Future loadProductLists(_ViewModel vm) async {
     try {
       var saveManager = ProductListsSaveManager(vm.store.state);
       var productLists = await saveManager.load();
@@ -75,6 +78,35 @@ class _MainScreenState extends State<MainScreen> {
   Future loadUserData(_ViewModel vm) async {
     final userManager = UserManager(store: vm.store);
     await userManager.loadUserFromFile();
+  }
+
+  Future<UserStatus> verifyUser(_ViewModel vm) async {
+    final userManager = UserManager(store: vm.store, currentUser: vm.store.state.currentUser);
+    return await userManager.verifyUser();
+  }
+
+  Future onFirstLoad(BuildContext context, _ViewModel vm) async {
+    await loadUserData(vm);
+    if (vm.store.state.currentUser == null) {
+      await Navigator.push(context, MaterialPageRoute(builder: (context) => UserLoginScreen()));
+    } else {
+      final status = await verifyUser(vm);
+      if (status == UserStatus.loggoutOut) {
+        await Navigator.push(context, MaterialPageRoute(builder: (context) => UserLoginScreen()));
+      } else if (status == UserStatus.banned) {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return SimpleAlertDialog(
+              title: Text("Notandi hefur verið bannaður"),
+            );
+          }
+        );
+        await Navigator.push(context, MaterialPageRoute(builder: (context) => UserLoginScreen()));
+      }
+    }
+    await loadProductData(context, vm);
+    await loadProductLists(vm);
   }
 
   void onTabTap(int index) {
@@ -92,9 +124,7 @@ class _MainScreenState extends State<MainScreen> {
             body: Builder(
               builder: (context) {
                 if (firstTime && !vm.appReady) {
-                  loadProductData(context, vm);
-                  loadProductLists(vm);
-                  loadUserData(vm);
+                  onFirstLoad(context, vm);
                   firstTime = false;
                 }
 
@@ -117,11 +147,13 @@ class _MainScreenState extends State<MainScreen> {
 class _ViewModel {
   final Store<AppState> store;
   final bool appReady;
+  final User currentUser;
   final ProductDataSearchResult productSearchResult;
 
   _ViewModel({
     @required this.store,
     @required this.appReady,
+    @required this.currentUser,
     @required this.productSearchResult,
   });
 
@@ -129,6 +161,7 @@ class _ViewModel {
     return new _ViewModel(
       store: store,
       appReady: store.state.appReady,
+      currentUser: store.state.currentUser,
       productSearchResult: store.state.productSearchResult,
     );
   }
