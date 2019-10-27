@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:husa_app/models/mtp_data.dart';
 import 'product_data.dart';
 import 'product_list.dart';
 import 'user.dart';
@@ -10,6 +11,7 @@ class AppState {
   final List<Product> productData;
   final List<ProductList> productLists;
   final User currentUser;
+  final MtpData mtpData;
 
   AppState({
     @required this.appReady,
@@ -18,6 +20,7 @@ class AppState {
     @required this.productData,
     @required this.productLists,
     @required this.currentUser,
+    @required this.mtpData,
   });
 
   AppState copyWith({bool appReady, bool productLoaded, ProductDataSearchResult productSearchResult, List<Product> productData, List<ProductList> productLists, User currentUser}) {
@@ -28,6 +31,7 @@ class AppState {
       productData: productData ?? this.productData,
       productLists: productLists ?? this.productLists,
       currentUser: currentUser ?? this.currentUser,
+      mtpData: mtpData ?? this.mtpData,
     );
   }
 

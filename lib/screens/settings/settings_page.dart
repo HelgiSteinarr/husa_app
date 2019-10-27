@@ -10,9 +10,12 @@ import 'settings_account_screen.dart';
 
 import '../../utilities/product_data_manager.dart';
 import '../../widgets/UpdateDataDialog.dart';
+import '../../widgets/TextInputDialog.dart';
 import '../../models/product_list.dart';
+import '../../actions/app_actions.dart';
 import '../../widgets/WaitDialog.dart';
 import '../../models/app_state.dart';
+import '../../models/mtp_data.dart';
 import '../../models/user.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -70,6 +73,30 @@ class _SettingsPageState extends State<SettingsPage> {
         });
   }
 
+  Future updateSsn(BuildContext context, _ViewModel vm) async {
+
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return TextInputDialog(
+            title: "Breyta kennitölu",
+            confirmText: "Breyta",
+            cancelText: "Hætta við",
+            hint: "Kennitala",
+            defaultText: vm.mtpData.ssn ?? "",
+            onFinish: (shouldChange, ssn) {
+              vm.store.dispatch(
+                UpdateMtpDataAction(
+                  mtpData:
+                      MtpData(ssn: ssn, historyItems: vm.mtpData.historyItems),
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, _ViewModel>(
@@ -120,6 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () {
                   templUploadProductLists(context, vm);
                 }),*/
+            _SettingsItem(title: "Breyta kennitölu", onTap: () {}),
             _SettingsItem(
                 title: "Um þetta app",
                 onTap: () {
@@ -172,11 +200,13 @@ class _SettingsItem {
 class _ViewModel {
   final List<ProductList> productLists;
   final User currentUser;
+  final MtpData mtpData;
   final Store<AppState> store;
 
   _ViewModel({
     @required this.productLists,
     @required this.currentUser,
+    @required this.mtpData,
     @required this.store,
   });
 
@@ -184,6 +214,7 @@ class _ViewModel {
     return new _ViewModel(
       productLists: store.state.productLists,
       currentUser: store.state.currentUser,
+      mtpData: store.state.mtpData,
       store: store,
     );
   }

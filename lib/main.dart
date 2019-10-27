@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:husa_app/models/mtp_data.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'utilities/search.dart';
@@ -6,6 +7,7 @@ import 'screens/main_screen.dart';
 import 'models/app_state.dart';
 import 'reducers/root_reducer.dart';
 import 'utilities/save_manager.dart';
+import 'utilities/clock_in_out_middleware.dart';
 import 'actions/product_data_actions.dart';
 import 'models/product_data.dart';
 
@@ -33,8 +35,12 @@ class AppRootState extends State<AppRoot> {
             ]),
         productLists: List(),
         productData: List(),
-        currentUser: null),
-    middleware: []..add(createSaveMiddleware())..add(createSearchMiddleware()),
+        currentUser: null,
+        mtpData: MtpData(ssn: null, historyItems: [])
+    ),
+    middleware: []..add(createSaveMiddleware())
+                  ..add(createSearchMiddleware())
+                  ..add(createClockInOutMiddleware()),
   );
 
   @override

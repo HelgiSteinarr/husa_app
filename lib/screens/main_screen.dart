@@ -137,6 +137,8 @@ class _MainScreenState extends State<MainScreen> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.assignment), title: Text("Vörulistar")),
               BottomNavigationBarItem(
+                icon: Icon(Icons.access_time), title: Text("Stimpla")),
+              BottomNavigationBarItem(
                   icon: Icon(Icons.settings), title: Text("Stillingar")),
             ], currentIndex: currentIndex, onTap: onTabTap),
           );
