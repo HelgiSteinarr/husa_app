@@ -36,7 +36,7 @@ class AppRootState extends State<AppRoot> {
         productLists: List(),
         productData: List(),
         currentUser: null,
-        mtpData: MtpData(ssn: null, historyItems: [])
+        mtpData: MtpData(historyItems: [])
     ),
     middleware: []..add(createSaveMiddleware())
                   ..add(createSearchMiddleware())

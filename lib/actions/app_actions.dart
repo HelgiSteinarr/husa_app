@@ -13,6 +13,12 @@ class UpdateUserAction {
   UpdateUserAction({@required this.user});
 }
 
+class UpdateUserSsnAction {
+  String ssn;
+
+  UpdateUserSsnAction({@required this.ssn});
+}
+
 class UpdateMtpDataAction {
   MtpData mtpData;
 

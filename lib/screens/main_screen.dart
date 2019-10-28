@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'product_lists/product_lists_page.dart';
 import 'product_search/product_search_page.dart';
+import 'clock/clock_page.dart';
 import 'settings/settings_page.dart';
 import 'user/user_login_screen.dart';
 import '../utilities/user_manager.dart';
@@ -28,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> pages = [
     ProductSearchPage(),
     ProductListsPage(),
+    ClockPage(),
     SettingsPage(),
   ];
 
@@ -137,10 +139,14 @@ class _MainScreenState extends State<MainScreen> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.assignment), title: Text("Vörulistar")),
               BottomNavigationBarItem(
-                icon: Icon(Icons.access_time), title: Text("Stimpla")),
+                  icon: Icon(Icons.access_alarm), title: Text("Stimpla")),
               BottomNavigationBarItem(
                   icon: Icon(Icons.settings), title: Text("Stillingar")),
-            ], currentIndex: currentIndex, onTap: onTabTap),
+            ], 
+            currentIndex: currentIndex,
+            onTap: onTabTap,
+            type: BottomNavigationBarType.fixed,
+            ),
           );
         });
   }

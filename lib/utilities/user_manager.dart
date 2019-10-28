@@ -67,6 +67,7 @@ class UserManager {
       currentUser = User(
           name: jsonResponse["name"],
           username: username,
+          ssn: null,
           token: jsonResponse["token"]);
 
       saveCurrentUser();

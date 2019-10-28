@@ -13,6 +13,10 @@ bool appReadyReducer(bool appReady, action) {
 User currentUserReducer(User currentUser, action) {
   if (action is UpdateUserAction) {
     return action.user;
+  } else if (action is UpdateUserSsnAction) {
+    return currentUser.copyWith(
+      ssn: action.ssn,
+    );
   }
   return currentUser;
 }

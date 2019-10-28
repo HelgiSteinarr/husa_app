@@ -11,6 +11,7 @@ import 'settings_account_screen.dart';
 import '../../utilities/product_data_manager.dart';
 import '../../widgets/UpdateDataDialog.dart';
 import '../../widgets/TextInputDialog.dart';
+import '../../utilities/user_manager.dart';
 import '../../models/product_list.dart';
 import '../../actions/app_actions.dart';
 import '../../widgets/WaitDialog.dart';
@@ -74,7 +75,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future updateSsn(BuildContext context, _ViewModel vm) async {
-
     await showDialog(
         context: context,
         barrierDismissible: false,
@@ -84,14 +84,20 @@ class _SettingsPageState extends State<SettingsPage> {
             confirmText: "Breyta",
             cancelText: "Hætta við",
             hint: "Kennitala",
-            defaultText: vm.mtpData.ssn ?? "",
+            keyboardType: TextInputType.number,
+            defaultText: vm.currentUser.ssn ?? "",
             onFinish: (shouldChange, ssn) {
-              vm.store.dispatch(
-                UpdateMtpDataAction(
-                  mtpData:
-                      MtpData(ssn: ssn, historyItems: vm.mtpData.historyItems),
-                ),
-              );
+              if (shouldChange) {
+                vm.store.dispatch(
+                  UpdateUserSsnAction(
+                    ssn: ssn,
+                  ),
+                );
+                final userManager = UserManager(
+                    store: vm.store,
+                    currentUser: vm.currentUser.copyWith(ssn: ssn));
+                userManager.saveCurrentUser();
+              }
             },
           );
         });
@@ -147,7 +153,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () {
                   templUploadProductLists(context, vm);
                 }),*/
-            _SettingsItem(title: "Breyta kennitölu", onTap: () {}),
+            _SettingsItem(
+                title: "Breyta kennitölu",
+                onTap: () {
+                  updateSsn(context, vm);
+                }),
             _SettingsItem(
                 title: "Um þetta app",
                 onTap: () {

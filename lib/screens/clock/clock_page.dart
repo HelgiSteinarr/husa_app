@@ -15,7 +15,7 @@ class ClockPage extends StatefulWidget {
 
 class _ClockPageState extends State<ClockPage> {
   void clockInOut(_ViewModel vm) {
-    vm.store.dispatch(ClockInOutAction(ssn: vm.mtpData.ssn));
+    vm.store.dispatch(ClockInOutAction(ssn: vm.currentUser.ssn));
   }
 
   String historyItemLabelText(_ViewModel vm) {
@@ -27,7 +27,7 @@ class _ClockPageState extends State<ClockPage> {
   }
 
   bool shouldDisableClockInOutButton(_ViewModel vm) {
-    return vm.mtpData.ssn == null;
+    return vm.currentUser.ssn == null;
   }
 
   Widget buildBody(BuildContext context, _ViewModel vm) {
@@ -47,7 +47,7 @@ class _ClockPageState extends State<ClockPage> {
             ),
           ),
           title: Text(vm.currentUser.name ?? "Nafn ekki skráð"),
-          subtitle: Text(vm.mtpData.ssn ?? "Kennitala ekki skráð"),
+          subtitle: Text(vm.currentUser.ssn ?? "Kennitala ekki skráð"),
         ),
         RaisedButton(
           child: Text("Stimpla inn/út"),

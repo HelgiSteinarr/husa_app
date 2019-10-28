@@ -8,7 +8,6 @@ MtpData mtpDataReducer(MtpData currentMtpData, action) {
     return action.mtpData;
   } else if (action is UpdateHistoryBoxItemsAction) {
     return MtpData(
-      ssn: currentMtpData.ssn,
       historyItems: action.historyItems,
     );
   }
