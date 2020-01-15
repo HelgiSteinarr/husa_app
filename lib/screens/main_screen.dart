@@ -100,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
           context: context,
           builder: (context) {
             return SimpleAlertDialog(
-              title: Text("Notandi hefur verið bannaður"),
+              title: Text("Tókst ekki að skrá inn"),
             );
           }
         );
